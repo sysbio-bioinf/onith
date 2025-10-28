@@ -9,7 +9,7 @@
 
 ONITH is available on PyPI and can be installed with pip:
 
-for alpah tester:
+for alpha tester:
 cd into the package folder (the one containing the pyproject.toml)
 ```bash
 pip install .
