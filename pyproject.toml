@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "onith"
+version = "0.1.0"
+description = "Human-in-the-loop pipeline generator for harmonization of non-clinical study data in SEND format (onith = ontology-based non-clinical integration and term harmonization)"
+authors = ["Winter, Lisa-Maria (DEV NCE) BIP-DE-B <lisa-maria.winter@boehringer-ingelheim.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pandas = "^2.2.3"
+nbformat = "^5.10.4"
+numpy = "^2.2.5"
+scikit-learn = "^1.6.1"
+networkx = "^3.4.2"
+regex = "^2024.11.6"
+plotly = "^6.0.1"
+seaborn = "^0.13.2"
+ipython = "^8.18.1"
+matplotlib = "^3.10.1"
+streamlit = "^1.45.1"
+streamlit-aggrid = "^1.1.4.post1"
+rapidfuzz = "^3.13.0"
+nbconvert = "^7.16.6"
+ipywidgets = "^8.1.7"
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

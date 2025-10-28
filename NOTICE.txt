@@ -1,0 +1,98 @@
+Library: pandas
+Version: ^2.2.3
+License: BSD 3-Clause
+Copyright: © pandas development team
+Source: https://github.com/pandas-dev/pandas
+NOTICE: This product includes software developed by the respective library authors.
+
+Library: nbformat
+Version: ^5.10.4
+License: BSD
+Copyright: © Jupyter Development Team
+Source: https://github.com/jupyter/nbformat
+NOTICE: This product includes software developed by the respective library authors.
+
+Library: numpy
+Version: ^2.2.5
+License: BSD
+Copyright: © NumPy Developers
+Source: https://github.com/numpy/numpy
+NOTICE: This product includes software developed by the respective library authors.
+
+Library: scikit-learn
+Version: ^1.6.1
+License: BSD
+Copyright: © scikit-learn developers
+Source: https://github.com/scikit-learn/scikit-learn
+NOTICE: This product includes software developed by the respective library authors.
+
+Library: regex
+Version: ^2024.11.6
+License: Apache 2.0
+Copyright: © Matthew Barnett
+Source: https://bitbucket.org/mrabarnett/mrab-regex
+NOTICE: This product includes software developed by the respective library authors.
+
+Library: plotly
+Version: ^6.0.1
+License: MIT
+Copyright: © Plotly, Inc.
+Source: https://github.com/plotly/plotly.py
+NOTICE: This product includes software developed by the respective library authors.
+
+Library: seaborn
+Version: ^0.13.2
+License: BSD
+Copyright: © Michael Waskom
+Source: https://github.com/mwaskom/seaborn
+NOTICE: This product includes software developed by the respective library authors.
+
+Library: ipython
+Version: ^8.18.1
+License: BSD
+Copyright: © IPython Development Team
+Source: https://github.com/ipython/ipython
+NOTICE: This product includes software developed by the respective library authors.
+
+Library: matplotlib
+Version: ^3.10.1
+License: Python Software Foundation License
+Copyright: © Matplotlib Development Team
+Source: https://github.com/matplotlib/matplotlib
+NOTICE: This product includes software developed by the respective library authors.
+
+Library: streamlit
+Version: ^1.45.1
+License: Apache 2.0
+Copyright: © Streamlit Inc.
+Source: https://github.com/streamlit/streamlit
+NOTICE: This product includes software developed by the respective library authors.
+
+Library: streamlit-aggrid
+Version: ^1.1.4.post1
+License: MIT
+Copyright: © Pablo Fonseca
+Source: https://github.com/PablocFonseca/streamlit-aggrid
+NOTICE: This product includes software developed by the respective library authors.
+
+Library: rapidfuzz
+Version: ^3.13.0
+License: MIT
+Copyright: © Max Bachmann
+Source: https://github.com/maxbachmann/rapidfuzz
+NOTICE: This product includes software developed by the respective library authors.
+
+Library: nbconvert
+Version: ^7.16.6
+License: BSD
+Copyright: © Jupyter Development Team
+Source: https://github.com/jupyter/nbconvert
+NOTICE: This product includes software developed by the respective library authors.
+
+Library: ipywidgets
+Version: ^8.1.7
+License: BSD
+Copyright: © Jupyter Development Team
+Source: https://github.com/jupyter-widgets/ipywidgets
+NOTICE: This product includes software developed by the respective library authors.
+
