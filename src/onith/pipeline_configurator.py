@@ -106,7 +106,7 @@ group_id_column = "ARMCD" # adjust if necessary. The group id should be integer 
 
     cells.append(nbf.v4.new_code_cell(
         "# Load and extract metadata from the demographics dataset\n"
-        "metadata = pd.read_csv(os.path.join(example_data_path, \"DM.csv\", sep=\";\"))\n"
+        "metadata = pd.read_csv(os.path.join(example_data_path, \"DM.csv\"), sep=\";\")\n"
         "metadata = project.extract_metadata(metadata,\n"
         "                                    output_dir=output_dir,\n"
         "                                    project_name=project_name,\n"
