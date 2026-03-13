@@ -127,6 +127,7 @@ def harmonize_formatting(
             df.loc[:, column] = df[column].str.replace(':', ',', regex=False)
             df.loc[:, column] = df[column].str.replace(',', ', ', regex=False)
             df.loc[:, column] = df[column].apply(lambda x: re.sub(r'\(.*?\)|\[.*?\]', '', x))
+            df.loc[:, column] = df[column].str.replace(r'\s+', ' ', regex=True).str.strip()
 
     df = df.replace("NAN", None)
     df = df.drop_duplicates()
@@ -175,7 +176,18 @@ def parse_obo_content(file_path):
                 continue
             if ": " in line:
                 key, value = line.split(": ", 1)
-                value = value.strip().strip('"')
+                value = value.strip()
+                
+                # For synonyms, extract text between quotes (handles metadata like MANUAL [date])
+                if key == "synonym":
+                    match = re.search(r'"([^"]*)"', value)
+                    if match:
+                        value = match.group(1)
+                    else:
+                        value = value.strip('"')
+                else:
+                    value = value.strip('"')
+                
                 if key in term_data:
                     # If the key already exists, append to the list
                     if isinstance(term_data[key], list):

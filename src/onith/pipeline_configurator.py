@@ -169,6 +169,7 @@ Note: Histopathological datasets usually consist to a large extend out of "NORMA
             "# Set 'integrate_manual_mapping' to True if the results of the manual mapping editor shall be integrated.\n"
             "# If all terms were already mapped automatically, set it to False.\n"
             "# Optional: update your local copy of the organ term ontology with the manually mapped synonyms from your dataset.\n"
+            "# If the sharable application was used for mapping: specify the path to the mapping json using the json_path_progress parameter.\n"
             "organ_mapping = mi.unite_and_save_mappings(df,\n"
             "                                           update_dict=False,\n"
             "                                           input_type=\"organ\",\n"
@@ -192,6 +193,7 @@ Note: Histopathological datasets usually consist to a large extend out of "NORMA
             "# Generate and save final lesion mapping (automatic and manual mapping results combined)\n"
             "# Set 'integrate_manual_mapping' to True if the results of the manual mapping editor shall be integrated.\n"
             "# If all terms were already mapped automatically, set it to False.\n"
+            "# If the sharable application was used for mapping: specify the path to the mapping json using the json_path_progress parameter.\n"
             "# Optional: update your local copy of the lesion term ontology with the manually mapped synonyms from your dataset to gradually refine the ontology for your use case.\n"
             "lesion_mapping = mi.unite_and_save_mappings(df,\n"
             "                                            update_dict=False,\n"
@@ -285,8 +287,8 @@ Note: Histopathological datasets usually consist to a large extend out of "NORMA
         ))
 
         cells.append(nbf.v4.new_code_cell(
-            "# Apply the mapping to the dataset for harmonization\n"
-            "# configure parameters based on function description.\n"
+            "# Apply the mapping to the dataset for harmonization.\n"
+            "# configure parameters based on function description. If the sharable application was used for mapping: specify the path to the mapping json using the json_path_progress parameter.\n"
             "df = lb.apply_mapping_lb(df,\n"
             "                      integrate_manual_mapping=False,\n"
             "                      delete_unmapped=False,\n"
@@ -420,7 +422,8 @@ To start the harmonization, configure the `OMHarmonizer` with custom column name
         ))
 
         cells.append(nbf.v4.new_code_cell(
-            "# Generate and save final organ mapping. Don't skip, even if no manual mapping was performed\n"
+            "# Generate and save final organ mapping. Don't skip, even if no manual mapping was performed.\n"
+            "# If the sharable application was used for mapping: specify the path to the mapping json using the json_path_progress parameter.\n"
             "organ_mapping = om.unite_and_save_mappings(organ_mapping,\n"
             "                                           update_dict=False,\n"
             "                                           input_type=\"organ\",\n"

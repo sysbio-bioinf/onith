@@ -177,7 +177,10 @@ def export_data_and_documentation(df : pd.DataFrame,
         # fetch information 
     timestamp = datetime.now().isoformat()
     python_version = platform.python_version()
-    pip_freeze = subprocess.check_output(['pip', 'freeze']).decode('utf-8')
+    try:
+        pip_freeze = subprocess.check_output([sys.executable, '-m', 'pip', 'freeze']).decode('utf-8')
+    except Exception as e:
+        pip_freeze = f"Could not retrieve installed packages: {e}\n"
     pyproject_metadata = ""
     
     current_file = Path(__file__)

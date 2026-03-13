@@ -158,7 +158,7 @@ class HarmonizerBase:
 
         Parameters:
             df (pd.DataFrame): The input DataFrame to be filtered.
-            metadata_path (str): Optional path to the metadata CSV file. If None, a default path is constructed.
+            metadata_path (str): Optional path to the metadata file (.csv, .xlsx, .xls). If None, default paths are checked.
 
         Returns:
             pd.DataFrame: Filtered DataFrame.
@@ -167,7 +167,16 @@ class HarmonizerBase:
             metadata_path = os.path.join(output_dir, f"metadata_{project_name}.csv")
 
         if os.path.exists(metadata_path):
-            metadata = pd.read_csv(metadata_path)
+            extension = os.path.splitext(metadata_path)[1].lower()
+
+            if extension == ".csv":
+                metadata = pd.read_csv(metadata_path)
+            elif extension in [".xlsx", ".xls"]:
+                metadata = pd.read_excel(metadata_path)
+            else:
+                print(f"Warning: Unsupported metadata file format '{extension}'. Use .csv, .xlsx, or .xls.")
+                return df
+
             if sample_column in metadata.columns:
                 df = df[df[sample_column].isin(metadata[sample_column])]
                 print(f"df shape after filtering by metadata ({metadata_path}): ", df.shape)

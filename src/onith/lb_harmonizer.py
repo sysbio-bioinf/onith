@@ -8,6 +8,8 @@ from .harmonizer_base import *
 from .ontology_utils import *
 import subprocess
 import json
+import sys
+import re
 from .export_logger import *
 import ipywidgets as widgets
 import warnings
@@ -26,14 +28,59 @@ class LBHarmonizer(HarmonizerBase):
     specimen_column: str = "LBSPEC"
 
 
-    def automatic_mapping_lb(self, df, metadata_path: str = None) -> pd.DataFrame:
+    @staticmethod
+    def _normalize_lb_marker_term(term: str):
+        """Apply the same text normalization used for ontology synonyms to one marker term."""
+        if pd.isna(term):
+            return None
+
+        normalized = str(term).upper()
+        replacements = [
+            (".", ""),
+            (" and ", ","),
+            (" or ", ","),
+            (" / ", ","),
+            ("/ ", ","),
+            ("/S", "S"),
+            ("/", ","),
+            (" - ", ","),
+            ("-", ","),
+            ("; ", ","),
+            (";", ","),
+            (", ", ","),
+            (": ", ","),
+            (" :", ","),
+            (":", ","),
+            (",", ", "),
+        ]
+        for old, new in replacements:
+            normalized = normalized.replace(old, new)
+
+        normalized = re.sub(r"\(.*?\)|\[.*?\]", "", normalized)
+        normalized = re.sub(r"\s+", " ", normalized).strip().rstrip(",").rstrip("-")
+
+        if normalized in {"", "NAN"}:
+            return None
+
+        return normalized
+
+
+    def automatic_mapping_lb(
+        self,
+        df,
+        metadata_path: str = None,
+        metadata_df: pd.DataFrame | None = None,
+    ) -> pd.DataFrame:
         """
         Automatically maps marker terms to standardized terminology using a predefined dictionary (based on SEND CDISC Terminology).
 
         Parameters:
         -----------
             df (pd.DataFrame): Input DataFrame containing marker names.
-            metadata_path (str, optional): Path to metadata file used for filtering. Defaults to None.
+            metadata_path (str, optional): Path to metadata file (CSV or Excel) used for filtering.
+                Defaults to None.
+            metadata_df (pd.DataFrame, optional): Metadata provided directly as DataFrame.
+                If provided, this is used instead of loading from metadata_path.
 
         Returns:
         -----------
@@ -53,7 +100,25 @@ class LBHarmonizer(HarmonizerBase):
         print("df shape after import: ", original_shape)
 
         # reduce by metadata
-        df = self.filter_by_metadata(df, output_dir=self.output_dir, sample_column=self.sample_column, project_name=self.project_name, metadata_path=metadata_path)
+        if metadata_df is not None:
+            metadata = metadata_df.copy()
+            df = pd.merge(df, metadata[[self.sample_column]], on=self.sample_column, how="inner").drop_duplicates()
+        else:
+            if metadata_path is None:
+                metadata_path = os.path.join(self.output_dir, f"metadata_{self.project_name}.csv")
+
+            metadata_suffix = Path(metadata_path).suffix.lower()
+            if metadata_suffix in {".xlsx", ".xls", ".xlsm", ".xlsb", ".ods"}:
+                metadata = pd.read_excel(metadata_path)
+                df = pd.merge(df, metadata[[self.sample_column]], on=self.sample_column, how="inner").drop_duplicates()
+            else:
+                df = self.filter_by_metadata(
+                    df,
+                    output_dir=self.output_dir,
+                    sample_column=self.sample_column,
+                    project_name=self.project_name,
+                    metadata_path=metadata_path,
+                )
 
         # load marker dictionary
         lb_dict = load_and_prepare_dict(input_type="lb")
@@ -63,10 +128,15 @@ class LBHarmonizer(HarmonizerBase):
         # only keep relevant columns
         df = df[[self.sample_column, self.original_marker_term_column, self.value_column, self.unit_column, self.specimen_column, self.day_column, self.study_id_column]].drop_duplicates()
 
+        # normalize marker terms to match the ontology normalization used in load_and_prepare_dict
+        df = df.copy()
+        normalized_term_col = "_normalized_lb_marker_term"
+        df[normalized_term_col] = df[self.original_marker_term_column].apply(self._normalize_lb_marker_term)
+
         # apply dictionary to harmonize marker names
         display(HTML("<p>Harmonization of blood marker terms is now running...</p>"))
-        df[self.measurement_column] = df[self.original_marker_term_column].map(dict_synonym_to_name)
-        df["marker_id"] = df[self.original_marker_term_column].map(dict_name_to_id)
+        df[self.measurement_column] = df[normalized_term_col].map(dict_synonym_to_name)
+        df["marker_id"] = df[self.measurement_column].map(dict_name_to_id)
 
         # identify marker names not found in the dictionary
         not_found_marker_terms = df[df[self.measurement_column].isna()][self.original_marker_term_column].drop_duplicates()
@@ -75,6 +145,8 @@ class LBHarmonizer(HarmonizerBase):
         <h1>Checkpoint: Are any blood markers lost in translation?</h1>
         <h3>Blood marker terms not found in the terminology:</h3>"""))
         display(not_found_marker_terms)
+
+        df = df.drop(columns=[normalized_term_col])
         
         return df
 
@@ -153,9 +225,21 @@ class LBHarmonizer(HarmonizerBase):
         module_dir = os.path.dirname(__file__)  
         app_path = os.path.join(module_dir, "manual_mapping_editor.py")
         json_path_mapping = json_path_mapping
-        json_path_dict = json_path_dict
+        json_path_dict = json_path_dict if json_path_dict else "NA"
         save_dir = os.path.join(self.temp_dir, f"{self.project_name}_{input_type}_progress_manual_mapping.json")
-        subprocess.Popen(["streamlit", "run", app_path, json_path_mapping, json_path_dict, save_dir, sharable, show_term_info])
+        subprocess.Popen([
+            sys.executable,
+            "-m",
+            "streamlit",
+            "run",
+            app_path,
+            "--",
+            json_path_mapping,
+            json_path_dict,
+            save_dir,
+            sharable,
+            show_term_info,
+        ], cwd=module_dir)
         display(HTML(f"<p>The editor will now open (as new tab in your internet explorer, can take a moment)...</p>"))
         
         return 
@@ -258,11 +342,15 @@ class LBHarmonizer(HarmonizerBase):
                 existing_synonyms = []
                 for l in term:
                     if l.strip().startswith("synonym:"):
-                        match = re.search(r'synonym:\s*"([^"]+)"', l)
-                        if match:
-                            existing_synonyms.append(match.group(1).strip())
+                        raw_synonym = l.split("synonym:", 1)[1].strip()
+                        match = re.search(r'"([^"]+)"', raw_synonym)
+                        synonym_text = match.group(1).strip() if match else raw_synonym
+                        synonym_norm = self._normalize_lb_marker_term(synonym_text)
+                        if synonym_norm is not None:
+                            existing_synonyms.append(synonym_norm)
 
-                if original_synonym in existing_synonyms:
+                original_synonym_norm = self._normalize_lb_marker_term(original_synonym)
+                if original_synonym_norm in existing_synonyms:
                     continue  # skip if synonym already exists
 
                 # find all synonym lines
@@ -358,12 +446,16 @@ class LBHarmonizer(HarmonizerBase):
 
             mapping_man["marker_id"] = mapping_man[self.measurement_column].map(dict_name_to_id)
             
-            mapping_man_dict = mapping_man.set_index(self.original_marker_term_column)[self.measurement_column].to_dict()
+            normalized_term_col = "_normalized_lb_marker_term"
+            mapping_man[normalized_term_col] = mapping_man[self.original_marker_term_column].apply(self._normalize_lb_marker_term)
+            mapping_man_dict = mapping_man.set_index(normalized_term_col)[self.measurement_column].to_dict()
 
             # merge manually with automatically mapped terms
             df = df.copy()
+            df[normalized_term_col] = df[self.original_marker_term_column].apply(self._normalize_lb_marker_term)
             mask = df[self.measurement_column].isna()
-            df.loc[mask, self.measurement_column] = df.loc[mask, self.original_marker_term_column].map(mapping_man_dict)
+            df.loc[mask, self.measurement_column] = df.loc[mask, normalized_term_col].map(mapping_man_dict)
+            df = df.drop(columns=[normalized_term_col])
         
         df.loc[:, "marker_id"] = df.loc[:, self.measurement_column].map(dict_name_to_id)
 
@@ -759,6 +851,7 @@ class LBHarmonizer(HarmonizerBase):
         if unit_dict is None:
             unit_dict = load_unit_dict()
         df = df.replace({self.unit_column: unit_dict})
+        df[self.unit_column] = df[self.unit_column].replace({"mg/dl": "mg/dL", "g/l": "g/L"})
 
         # Step 2: Identify blood markers with multiple units
         display(HTML("<p>Step 2: Exploring unit usage across markers and studies...</p>"))
@@ -796,6 +889,7 @@ class LBHarmonizer(HarmonizerBase):
             df[self.unit_column].isin(["%", "10^9/L", "10^12/L"])
         )
         df = df[~condition]
+
 
         hematology_marker = duplicated_units_false[self.measurement_column].drop_duplicates().to_list()
 
@@ -837,13 +931,21 @@ class LBHarmonizer(HarmonizerBase):
         return df
 
 
-    def control_stats(self, df: pd.DataFrame, metadata_path: str = None) -> tuple[pd.DataFrame, pd.DataFrame]:
+    def control_stats(
+        self,
+        df: pd.DataFrame,
+        metadata_path: str = None,
+        metadata_df: pd.DataFrame | None = None,
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
         """
         Computes control group statistics and separates treated animals for further analysis.
 
         Parameters:
             df (pd.DataFrame): Input DataFrame with harmonized LB data.
-            metadata_path (str, optional): Path to metadata file. If None, uses default project path.
+            metadata_path (str, optional): Path to metadata file (CSV or Excel).
+                If None, uses default project path.
+            metadata_df (pd.DataFrame, optional): Metadata provided directly as DataFrame.
+                If provided, this is used instead of loading from metadata_path.
 
         Returns:
             tuple: (control_stats, treated) where:
@@ -851,11 +953,16 @@ class LBHarmonizer(HarmonizerBase):
                 - treated (pd.DataFrame): Subset of treated animals for downstream analysis.
         """
 
-        if metadata_path is None:
-            metadata_path = os.path.join(self.output_dir, f"metadata_{self.project_name}.csv")
-            metadata = pd.read_csv(metadata_path)
-        else: 
-            metadata = pd.read_csv(metadata_path)
+        if metadata_df is not None:
+            metadata = metadata_df.copy()
+        else:
+            if metadata_path is None:
+                metadata_path = os.path.join(self.output_dir, f"metadata_{self.project_name}.csv")
+            metadata_suffix = Path(metadata_path).suffix.lower()
+            if metadata_suffix in {".xlsx", ".xls", ".xlsm", ".xlsb", ".ods"}:
+                metadata = pd.read_excel(metadata_path)
+            else:
+                metadata = pd.read_csv(metadata_path)
         
         # merge with metadata
         df = pd.merge(df, metadata[[self.sample_column,self.group_id_column]], on=self.sample_column, how="inner").drop_duplicates()

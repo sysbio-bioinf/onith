@@ -3,7 +3,7 @@ import json
 import os
 import sys
 from pathlib import Path
-from onith.mi_harmonizer import hpath_term_info_to_json
+from onith.ontology_utils import hpath_term_info_to_json
 
 st.set_page_config(layout="wide")
 

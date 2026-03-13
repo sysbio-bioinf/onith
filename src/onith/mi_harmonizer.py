@@ -14,6 +14,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import subprocess
 import os 
+import sys
 from pathlib import Path
 
 
@@ -585,8 +586,21 @@ class MIHarmonizer(HarmonizerBase):
         """
         module_dir = os.path.dirname(__file__)  
         app_path = os.path.join(module_dir, "manual_mapping_editor.py")
+        json_path_dict = json_path_dict if json_path_dict else "NA"
         save_dir = os.path.join(self.temp_dir, f"{self.project_name}_{self.domain}_{input_type}_progress_manual_mapping.json")
-        subprocess.Popen(["streamlit", "run", app_path, json_path_mapping, json_path_dict, save_dir, sharable, show_term_info])
+        subprocess.Popen([
+            sys.executable,
+            "-m",
+            "streamlit",
+            "run",
+            app_path,
+            "--",
+            json_path_mapping,
+            json_path_dict,
+            save_dir,
+            sharable,
+            show_term_info,
+        ], cwd=module_dir)
         
         return
         
