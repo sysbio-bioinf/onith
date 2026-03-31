@@ -92,7 +92,7 @@ class OMHarmonizer(LBHarmonizer, MIHarmonizer):
         print(f"dataframe shape after reducing to parameters_type '{parameter_type}': ", df.shape)
         
         df = df.drop(columns=self.measurement_column)
-        self.measurement_column = self.organ_column
+        self.measurement_column = "harmonized_organ"
         
         return df
                 
@@ -103,6 +103,6 @@ class OMHarmonizer(LBHarmonizer, MIHarmonizer):
         """
 
         # Generate pivot table
-        om_pivot = pd.pivot_table(df[[self.sample_column, self.organ_column, "z-score"]], index=self.sample_column, columns=self.organ_column, values="z-score", fill_value=np.nan)
+        om_pivot = pd.pivot_table(df[[self.sample_column, "harmonized_organ", "z-score"]], index=self.sample_column, columns="harmonized_organ", values="z-score", fill_value=np.nan)
 
         return om_pivot

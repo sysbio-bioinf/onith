@@ -29,6 +29,8 @@ def load_normal_entries(as_dict: bool = True):
         "ARTIFACT(S)",
         "INCLUSIONS, HEPATOCYTE, ARTIFACT",
         "NOS",
+        "NOT EXAMINED",
+        "NOT PRESENT",
         "PARS NERVOSA NOT CUT IN SECTION",
         "UNDETERMINED STAGE OF ESTRUS CYCLE",
         "NAN"
