@@ -1,21 +1,14 @@
 # Onith
 
 ## Links
-- Paper: (link)
-- PyPI: (link)
-- GitHub: (link)
+- Paper: (our paper is currently under revision. We'll add the link as soon as it is published)
+- PyPI: [(link)](https://pypi.org/project/onith/)
+- GitHub: [(link)](https://github.com/sysbio-bioinf/onith)
 
 ## Installation
 
-ONITH is available on PyPI and can be installed with pip:
+ONITH is available on PyPI and can be installed via pip:
 
-for alpha tester:
-cd into the package folder (the one containing the pyproject.toml)
-```bash
-pip install .
-```
-
-for final users:
 ```bash
 pip install onith
 ```
@@ -55,9 +48,6 @@ For each specified domain, the custom harmonization pipeline will include a sect
 
 The generated harmonization pipeline includes default paths to example data, allowing you to explore and test the process before loading your own datasets.
 
-## Package Architecture
-![Package Architecture](Package_Architecture.png)
-
 ## Documentation
 
 Step-by-step instructions for all following steps will be given in the generated custom notebook file, based on the harmonization pipeline configuration.
@@ -71,3 +61,4 @@ You are free to use, modify, and distribute this software with proper attributio
 ## Citation
 
 Please cite our work in your publications if this package contributed to your project.
+Thank you!
