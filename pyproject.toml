@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "onith"
-version = "0.1.0"
+version = "0.1.1"
 description = "Human-in-the-loop pipeline generator for harmonization of non-clinical study data in SEND format (onith = ontology-based non-clinical integration and term harmonization)"
 authors = ["Winter, Lisa-Maria (DEV NCE) BIP-DE-B <lisa-maria.winter@boehringer-ingelheim.com>"]
 license = "MIT"
