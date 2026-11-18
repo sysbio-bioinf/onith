@@ -1,9 +1,9 @@
 # Onith
 
 ## Links
-- Paper: (our paper is currently under revision. We'll add the link as soon as it is published)
-- PyPI: [(link)](https://pypi.org/project/onith/)
-- GitHub: [(link)](https://github.com/sysbio-bioinf/onith)
+- Paper: [https://www.sciencedirect.com/science/article/pii/S0169260726004712](https://www.sciencedirect.com/science/article/pii/S0169260726004712)
+- PyPI: [https://pypi.org/project/onith/](https://pypi.org/project/onith/)
+- GitHub: [https://github.com/sysbio-bioinf/onith](https://github.com/sysbio-bioinf/onith)
 
 ## Installation
 
@@ -47,6 +47,9 @@ For each specified domain, the custom harmonization pipeline will include a sect
 - ```om```: If set to True, the custom harmonization pipeline will include a section dedicated to the harmonization of the **OM data domain (Organ Measurements)**
 
 The generated harmonization pipeline includes default paths to example data, allowing you to explore and test the process before loading your own datasets.
+
+## Architecture
+<img src="Package_Architecture.png">
 
 ## Documentation
 

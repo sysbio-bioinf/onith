@@ -134,7 +134,7 @@ class LBHarmonizer(HarmonizerBase):
         df[normalized_term_col] = df[self.original_marker_term_column].apply(self._normalize_lb_marker_term)
 
         # apply dictionary to harmonize marker names
-        display(HTML("<p>Harmonization of blood marker terms is now running...</p>"))
+        display(HTML("<p>Harmonization of terms is now running...</p>"))
         df[self.measurement_column] = df[normalized_term_col].map(dict_synonym_to_name)
         df["marker_id"] = df[self.measurement_column].map(dict_name_to_id)
 
@@ -990,8 +990,8 @@ class LBHarmonizer(HarmonizerBase):
 
         # create HTML output
         html_output = f"""
-        <h1>Checkpoint: Does statistics of control animals per study per blood marker look reasonable? Anything suspicious?</h1>
-        <h2>control statistics per blood marker: </h2>
+        <h1>Checkpoint: Does statistics of control animals per study look reasonable? Anything suspicious?</h1>
+        <h2>control statistics per feature: </h2>
         {control_stats.head(40).to_html()}
         <p>If everything seems ok, we can continue by using the mean and standard deviation z-score calculation (and timepoint selection if necessary) of the treated animals.</p>
         """
@@ -1029,9 +1029,9 @@ class LBHarmonizer(HarmonizerBase):
             g.ax_heatmap.set_xticklabels([])
             g.ax_heatmap.set_yticklabels([])
             g.ax_heatmap.tick_params(left=False, bottom=False, right=False)
-            g.ax_heatmap.set_xlabel("Blood Markers")
+            g.ax_heatmap.set_xlabel("Features")
             g.ax_heatmap.set_ylabel("Animals")  
-            g.ax_heatmap.set_title("Number of Measurements per Bloodmarker per Animal")
+            g.ax_heatmap.set_title("Number of Measurements per Feature per Animal")
             
             colorbar = g.ax_heatmap.collections[0].colorbar
             colorbar.set_ticks([0, 1, 2, 3])
